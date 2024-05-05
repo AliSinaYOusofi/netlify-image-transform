@@ -7,7 +7,11 @@ export default function Home() {
   const [quality, setQuality] = useState(75); 
   const [width, setWidth] = useState(800);
   const [height, setHeight] = useState(500);
+  const [spinner, setSpinner] = useState(false)
   const [objectFit, setObjectFit] = useState("cover");
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("")
+
   const objectFitOptions = ["cover", "contain", "fill", "none", "scale-down"];
 
   const handleQualityChange = (event) => {
@@ -15,6 +19,8 @@ export default function Home() {
     const value = parseInt(event.target.value); 
     
     if (isNaN(value) || value < 1 || value > 100) {
+      setIsError(true);
+      setErrorMessage("Quality must be a number between 1 and 100");
       return; 
     }
     
@@ -22,10 +28,22 @@ export default function Home() {
   };
 
   const handleWidthChange = (event) => {
+    console.log(event.target.value)
+    if ( !(event.target.value )) {
+      setIsError(true);
+      setErrorMessage("Width must be a number greater than 0");
+      return;
+    }
     setWidth(parseInt(event.target.value));
   };
 
   const handleHeightChange = (event) => {
+
+    if ( !(event.target.value)) {
+      setIsError(true);
+      setErrorMessage("Height must be a number greater than 0");
+      return;
+    }
     setHeight(parseInt(event.target.value));
   };
   const handleObjectFitChange = (event) => {
@@ -37,13 +55,53 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-10">
+    <main className="flex flex-col items-center justify-center relative">
       
-      <div className="image h-[90%] border-10 border-white">
-        <Image src={"/images/uwp4301503.jpeg"} alt="Picture of the author" width={width} height={height} />
+      {
+        errorMessage && isError
+        &&
+        <div className="flex p-4 bg-gray-600 rounded-md absolute top-2">
+          
+          <div className="flex-shrink-0">
+            <svg className="flex-shrink-0 size-4 text-blue-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
+            </svg>
+          </div>
+          
+          <div className="ms-3">
+            <p className="text-sm text-gray-100 dark:text-neutral-100">
+              {errorMessage}
+            </p>
+          </div>
+          
+          <button
+            onClick={() => setIsError(false)} 
+            type="button" 
+            className="inline-flex ml-3 flex-shrink-0 justify-center items-center size-5 rounded-lg text-white hover:text-white opacity-50 hover:opacity-100 focus:outline-none focus:opacity-100">
+              
+            <span className="sr-only">Close</span>
+          
+            <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+        </button>
+        </div>
+      }
+
+      <div className="image h-[80%] min-h-screen w-[90%] mx-auto flex items-start justify-center ">
+        <Image 
+          src={"/images/uwp4301503.jpeg"} 
+          objectFit={objectFit} alt="Picture" 
+          width={width} 
+          height={height} 
+          className={`mt-10 h-[${height}px]`}
+        />
       </div>
-  
-        
+
+
+      <div className="absolute bottom-0 ">
+
         <form class=" flex  justify-between w-full gap-10 mt-10">
           <div className="form-group mb-3 w-1/2">
             <label htmlFor="quality" className="form-label inline-block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -111,13 +169,18 @@ export default function Home() {
           <button 
             type="button"
             onClick={transformImage} 
+            disabled={spinner}
             className="w-full gap  text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
               Transform &nbsp;
-              <div className="absolute right-1  animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full dark:text-white" role="status" aria-label="loading">
+              {
+                spinner && <div className="absolute right-1  animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full dark:text-white" role="status" aria-label="loading">
                 
-              </div>
+                </div>
+              }
+              
             </button>
         </div>
+      </div>
     </main>
   );
 }
