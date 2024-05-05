@@ -8,50 +8,68 @@ export default function Home() {
   const [width, setWidth] = useState(800);
   const [height, setHeight] = useState(500);
   const [spinner, setSpinner] = useState(false)
-  const [objectFit, setObjectFit] = useState("cover");
+  const [objectFit, setObjectFit] = useState("contain");
   const [isError, setIsError] = useState(false);
+  const [format, setFormat] = useState('jpg')
   const [errorMessage, setErrorMessage] = useState("")
+  const [position, setPosition] = useState('center')
 
-  const objectFitOptions = ["cover", "contain", "fill", "none", "scale-down"];
+  const objectFitOptions = ["cover", "contain", "fill"]
+  const formatOptions = ['avif', 'jpg',  'webp', 'blurhash', 'gif']
+  const positionOptions = ['top', 'center', 'bottom', 'left', 'center']
 
   const handleQualityChange = (event) => {
     
     const value = parseInt(event.target.value); 
     
-    if (isNaN(value) || value < 1 || value > 100) {
-      setIsError(true);
-      setErrorMessage("Quality must be a number between 1 and 100");
-      return; 
-    }
-    
     setQuality(value);
   };
 
   const handleWidthChange = (event) => {
-    console.log(event.target.value)
-    if ( !(event.target.value )) {
-      setIsError(true);
-      setErrorMessage("Width must be a number greater than 0");
-      return;
-    }
     setWidth(parseInt(event.target.value));
+
   };
 
   const handleHeightChange = (event) => {
-
-    if ( !(event.target.value)) {
-      setIsError(true);
-      setErrorMessage("Height must be a number greater than 0");
-      return;
-    }
     setHeight(parseInt(event.target.value));
-  };
+  }
+
   const handleObjectFitChange = (event) => {
     setObjectFit(event.target.value);
   };
 
-  const transformImage = () => {
+  const transformImage = async  () => {
 
+    // validate every field
+    if (width < 1) {
+      setIsError(true);
+      setErrorMessage("Width must be a number greater than 0");
+      return;
+    }
+
+    else if (height < 1) {
+      setIsError(true);
+      setErrorMessage("Height must be a number greater than 0");
+      return;
+    }
+
+    else if (quality < 1 || quality > 100) {
+      setIsError(true);
+      setErrorMessage("Quality must be a number between 1 and 100");
+      return;
+    }
+
+    setSpinner(true)
+    
+    try {
+      const result = await fetch(`https://peppy-profiterole-58b1ee.netlify.app/.netlify/images?url=images/uwp4301503.jpeg&width=${width}&height=${height}&fit=${objectFit}&fm=${format}&position=${position}&q=${quality}`)
+      console.log(result)
+      window.open(result.url, '_blank')
+    } catch (error) {
+      console.error("error fetching: ", error.message)
+    } finally {
+      setSpinner(false)
+    }
   }
 
   return (
@@ -92,17 +110,18 @@ export default function Home() {
       <div className="image h-[80%] min-h-screen w-[90%] mx-auto flex items-start justify-center ">
         <Image 
           src={"/images/uwp4301503.jpeg"} 
-          objectFit={objectFit} alt="Picture" 
-          width={width} 
+          alt="Picture" 
+          width={800} 
           height={height} 
-          className={`mt-10 h-[${height}px]`}
+          className={`mt-10 h-[${height}px] object-[${objectFit}]`}
+          priority
         />
       </div>
 
 
       <div className="absolute bottom-0 ">
 
-        <form class=" flex  justify-between w-full gap-10 mt-10">
+        <form className=" flex  justify-between w-full gap-10 mt-10">
           <div className="form-group mb-3 w-1/2">
             <label htmlFor="quality" className="form-label inline-block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Quality:
@@ -156,8 +175,44 @@ export default function Home() {
               id="objectFit"
               className="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               onChange={handleObjectFitChange}
+              value={objectFit}
             >
               {objectFitOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group mb-3 w-1/2">
+            <label htmlFor="format" className="form-label inline-block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Format:
+            </label>
+            <select 
+              id="format"
+              value={format} 
+              className="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              onChange={(e) => setFormat(e.target.value)}  
+            >
+              
+              {formatOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group mb-3 w-1/2">
+            
+            <label 
+              htmlFor="position" 
+              className="form-label inline-block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Position:
+            </label>
+            
+            <select id="position" value={position} className="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={(e) => setPosition(e.target.value)}>
+              {positionOptions.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>
