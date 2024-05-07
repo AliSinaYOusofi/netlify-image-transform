@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/image";
 import { useState } from "react";
+import CarouselComponent from "@/components/Carousel";
 
 export default function Home() {
   
@@ -13,6 +14,13 @@ export default function Home() {
   const [format, setFormat] = useState('jpg')
   const [errorMessage, setErrorMessage] = useState("")
   const [position, setPosition] = useState('center')
+  const [currentImage, setCurrentImage] = useState()
+  const images = [
+    { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
+    { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
+    { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
+    { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
+  ];
 
   const objectFitOptions = ["cover", "contain", "fill"]
   const formatOptions = ['avif', 'jpg',  'webp', 'blurhash', 'gif']
@@ -107,7 +115,7 @@ export default function Home() {
         </div>
       }
 
-      <div className="image h-[80%] min-h-screen w-[90%] mx-auto flex items-start justify-center ">
+      <div className="image   w-[90%] mx-auto flex items-start justify-center ">
         <Image 
           src={"/images/uwp4301503.jpeg"} 
           alt="Picture" 
@@ -118,8 +126,22 @@ export default function Home() {
         />
       </div>
 
+      <div className="w-full h-full flex gap-x-4 items-center justify-center mt-10">
+        {images.map((image, index) => (
+          <div key={index} className="carousel-item flex">
+            <Image
+              src={image.src}
+              alt={image.alt}
+              className="\ object-cover  inset-0"
+              width={150}
+              height={150}
+            />
+          </div>
+        ))}
+      </div>
 
-      <div className="absolute bottom-0 ">
+
+      <div className=" ">
 
         <form className=" flex  justify-between w-full gap-10 mt-10">
           <div className="form-group mb-3 w-1/2">
