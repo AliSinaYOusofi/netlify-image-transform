@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CarouselComponent from "@/components/Carousel";
 
 export default function Home() {
@@ -14,13 +14,15 @@ export default function Home() {
   const [format, setFormat] = useState('jpg')
   const [errorMessage, setErrorMessage] = useState("")
   const [position, setPosition] = useState('center')
-  const [currentImage, setCurrentImage] = useState()
+  const carouselImageRef = useRef(null)
   const images = [
     { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
-    { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
-    { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
-    { src: '/images/uwp4301503.jpeg', alt: 'Image 1' },
+    { src: '/images/uwp3545656.jpeg', alt: 'Image 1' },
+    { src: '/images/uwp3795842.jpeg', alt: 'Image 1' },
+    { src: '/images/uwp3795844.jpeg', alt: 'Image 1' },
+    { src: '/images/uwp3544542.jpeg', alt: 'Image 1' },
   ];
+  const [currentImage, setCurrentImage] = useState(images[0])
 
   const objectFitOptions = ["cover", "contain", "fill"]
   const formatOptions = ['avif', 'jpg',  'webp', 'blurhash', 'gif']
@@ -70,7 +72,7 @@ export default function Home() {
     setSpinner(true)
     
     try {
-      const result = await fetch(`https://peppy-profiterole-58b1ee.netlify.app/.netlify/images?url=images/uwp4301503.jpeg&width=${width}&height=${height}&fit=${objectFit}&fm=${format}&position=${position}&q=${quality}`)
+      const result = await fetch(`https://peppy-profiterole-58b1ee.netlify.app/.netlify/images?url=images/${currentImage}.jepg&width=${width}&height=${height}&fit=${objectFit}&fm=${format}&position=${position}&q=${quality}`)
       console.log(result)
       window.open(result.url, '_blank')
     } catch (error) {
@@ -80,8 +82,23 @@ export default function Home() {
     }
   }
 
+  const scrollBackwaard = () => {
+    carouselImageRef.current.scrollBy({
+      top: 0,
+      left: 100,
+      behavior: 'smooth'
+    });
+  }
+
+  const scrollForward = () => {
+    carouselImageRef.current.scrollBy({
+      top: 0,
+      left: -100,
+      behavior: 'smooth'
+    });
+  }
   return (
-    <main className="flex flex-col items-center justify-center relative">
+    <main className="flex gap-y-4 flex-col items-center justify-center relative">
       
       {
         errorMessage && isError
@@ -89,7 +106,7 @@ export default function Home() {
         <div className="flex p-4 bg-gray-600 rounded-md absolute top-2">
           
           <div className="flex-shrink-0">
-            <svg className="flex-shrink-0 size-4 text-blue-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <svg className="flex-shrink-0 size-4 text-blue-500 " xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
             </svg>
           </div>
@@ -117,33 +134,58 @@ export default function Home() {
 
       <div className="image   w-[90%] mx-auto flex items-start justify-center ">
         <Image 
-          src={"/images/uwp4301503.jpeg"} 
+          src={currentImage.src} 
           alt="Picture" 
           width={800} 
           height={height} 
-          className={`mt-10 h-[${height}px] object-[${objectFit}]`}
+          className={` h-[${height}px] object-[${objectFit}]`}
           priority
         />
       </div>
 
-      <div className="w-full h-full flex gap-x-4 items-center justify-center mt-10">
+      <div ref={carouselImageRef} className=" overflow-scroll h-full flex items-center gap-x-2 justify-center relative">
+        <button
+            type="button"
+            className=" bg-white  fixed left-[20%] text-black rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+            onClick={scrollBackwaard}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+
+        </button>
         {images.map((image, index) => (
-          <div key={index} className="carousel-item flex">
+          <div onClick={() => setCurrentImage(image)} key={index} className="carousel-item flex">
             <Image
               src={image.src}
               alt={image.alt}
-              className="\ object-cover  inset-0"
+              className="object-cover inset-0"
               width={150}
               height={150}
             />
           </div>
-        ))}
+          ))
+        }
+        
+          
+          <button
+            type="button"
+            className="bg-white fixed right-[20%] text-black rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+            onClick={scrollForward}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+
+          </button>
+        
       </div>
+
 
 
       <div className=" ">
 
-        <form className=" flex  justify-between w-full gap-10 mt-10">
+        <form className=" flex  justify-between w-full gap-10 ">
           <div className="form-group mb-3 w-1/2">
             <label htmlFor="quality" className="form-label inline-block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Quality:
@@ -242,7 +284,7 @@ export default function Home() {
             </select>
           </div>
         </form>
-        <div className="mt-4 gap-10  relative">
+        <div className=" w-1/2 gap-10 mx-auto  relative">
           <button 
             type="button"
             onClick={transformImage} 
