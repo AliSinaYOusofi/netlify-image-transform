@@ -6,4 +6,4 @@ status = 200
 force = true
 
 [images]
-  remote_images = ["https://res.cloudinary.com/*"]
+  remote_images = ["https://res.cloudinary.com/dudhf0avt/image/upload/.*"]

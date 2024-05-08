@@ -7,6 +7,12 @@ const nextConfig = {
                 hostname: 'res.cloudinary.com',
                 port: '',
                 pathname: '/**'
+            },
+            {
+                protocol: "https",
+                hostname: "peppy-profiterole-58b1ee.netlify.app",
+                port: "",
+                pathname: "/**"
             }
         ]
     }
